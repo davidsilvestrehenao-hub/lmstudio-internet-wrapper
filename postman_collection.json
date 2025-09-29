@@ -1,0 +1,1118 @@
+{
+  "info": {
+    "name": "LM Studio Wrapper API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API for interacting with LM Studio with internet access and tool capabilities"
+  },
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Get the health status of the API and its dependencies"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Chat (Automated Tool Execution)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Search for information about artificial intelligence and write a summary to a file\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Send messages to LM Studio with automatic tool execution. Tools will be executed automatically when LM Studio returns JSON tool calls."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat (Legacy - Manual Tool Calling)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Hello!\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/legacy",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "legacy"]
+            },
+            "description": "Send messages to LM Studio without automatic tool execution. Use this if you want to manually handle tool calls via /call endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Multi-Tool Workflow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Search for 'machine learning', then calculate 2+2, then write both results to a file called 'results.txt'\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Example of a multi-tool workflow that will automatically execute search, math, and file operations."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Non-Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"List all files in the current directory\"\n        }\n    ],\n    \"stream\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Non-streaming chat that returns a complete JSON response instead of chunks."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Overrides - Non-Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Write a creative story about a robot\"\n        }\n    ],\n    \"stream\": false,\n    \"overrides\": {\n        \"temperature\": 0.9,\n        \"max_tokens\": 200,\n        \"top_p\": 0.95,\n        \"frequency_penalty\": 0.5,\n        \"presence_penalty\": 0.3\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/overrides",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "overrides"]
+            },
+            "description": "Non-streaming chat with LM Studio parameter overrides for creative writing."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Overrides - Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Explain quantum computing in simple terms\"\n        }\n    ],\n    \"stream\": true,\n    \"overrides\": {\n        \"temperature\": 0.3,\n        \"max_tokens\": 300,\n        \"top_p\": 0.8\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/overrides",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "overrides"]
+            },
+            "description": "Streaming chat with LM Studio parameter overrides for technical explanations."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Overrides - High Creativity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Write a poem about space\"\n        }\n    ],\n    \"stream\": false,\n    \"overrides\": {\n        \"temperature\": 1.2,\n        \"top_p\": 0.95,\n        \"frequency_penalty\": 0.8,\n        \"presence_penalty\": 0.6\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/overrides",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "overrides"]
+            },
+            "description": "High creativity settings for creative writing tasks like poetry."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Overrides - Low Creativity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Explain how HTTP works\"\n        }\n    ],\n    \"stream\": false,\n    \"overrides\": {\n        \"temperature\": 0.1,\n        \"top_p\": 0.7,\n        \"frequency_penalty\": 0.0,\n        \"presence_penalty\": 0.0\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/overrides",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "overrides"]
+            },
+            "description": "Low creativity settings for technical documentation and factual explanations."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Overrides - Balanced",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Tell me about renewable energy\"\n        }\n    ],\n    \"stream\": false,\n    \"overrides\": {\n        \"temperature\": 0.7,\n        \"top_p\": 0.9,\n        \"frequency_penalty\": 0.2,\n        \"presence_penalty\": 0.1\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat/overrides",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "overrides"]
+            },
+            "description": "Balanced settings for general conversation and mixed tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat (WebSocket)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{wsBaseUrl}}/ws",
+              "host": ["{{wsBaseUrl}}"],
+              "path": ["ws"]
+            },
+            "description": "Connect to the WebSocket endpoint for real-time chat. This is a GET request to document the endpoint. Use a WebSocket client to connect to ws://localhost:3001/ws."
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - File Operations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Create a directory called 'demo', write a file called 'test.txt' with some content, copy it to 'backup.txt', list all files, get info about 'test.txt', then delete the original 'test.txt'\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Demonstrates file operations: createDirectory, writeFile, copyFile, listFiles, getFileInfo, deleteFile"
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - Search & Math",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Search for 'artificial intelligence' using DuckDuckGo, then calculate 15 * 23 + 45, then search for 'machine learning' and write both results to a file called 'search_results.txt'\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Demonstrates search and math tools: search, math, writeFile"
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - Archive Operations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Create two text files 'file1.txt' and 'file2.txt' with different content, then zip them into 'archive.zip', then unzip the archive into a folder called 'extracted'\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Demonstrates archive operations: writeFile, zipFiles, unzipFile"
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - File Search & Grep",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Create a JavaScript file with some functions, then use grep to find all lines containing 'function', and use findFiles to locate all .js files\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Demonstrates file search tools: writeFile, grep, findFiles"
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - Network & System",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Fetch data from https://httpbin.org/json, then execute the 'ls -la' command to list files, and write both results to a file called 'network_and_system.txt'\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Demonstrates network and system tools: fetch, executeCommand, writeFile"
+          },
+          "response": []
+        },
+        {
+          "name": "Tool Demo - Complete Workflow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Create a project structure: make a 'src' directory, create 'app.js' and 'utils.js' files with some code, search for 'JavaScript best practices', calculate the file sizes, zip the project, then clean up by deleting the original files\"\n        }\n    ],\n    \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat"]
+            },
+            "description": "Complete workflow demonstrating multiple tools: createDirectory, writeFile, search, math, zipFiles, deleteFile"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tools",
+      "item": [
+        {
+          "name": "List Tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tools",
+              "host": ["{{baseUrl}}"],
+              "path": ["tools"]
+            },
+            "description": "Get a list of all available tools"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Math",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"math\",\n    \"params\": {\n        \"expr\": \"2 + 2 * 3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Execute the math tool with a mathematical expression"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Search (DuckDuckGo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"search\",\n    \"params\": {\n        \"query\": \"artificial intelligence\",\n        \"engine\": \"duckduckgo\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Search using DuckDuckGo (default, no API key required)"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Search (Google)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"search\",\n    \"params\": {\n        \"query\": \"machine learning\",\n        \"engine\": \"google\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Search using Google (requires GOOGLE_API_KEY and GOOGLE_CX env vars)"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Search (Bing)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"search\",\n    \"params\": {\n        \"query\": \"neural networks\",\n        \"engine\": \"bing\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Search using Bing (requires BING_API_KEY env var)"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Search (Brave)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"search\",\n    \"params\": {\n        \"query\": \"deep learning\",\n        \"engine\": \"brave\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Search using Brave (requires BRAVE_API_KEY env var)"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Fetch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"fetch\",\n    \"params\": {\n        \"url\": \"https://httpbin.org/json\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Fetch raw content from a given URL"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Read File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"files\",\n    \"params\": {\n        \"path\": \"example.txt\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Read text content from a sandboxed file"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Write File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"writeFile\",\n    \"params\": {\n        \"path\": \"example.txt\",\n        \"content\": \"Hello, World!\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Write text content to a sandboxed file"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Delete File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"deleteFile\",\n    \"params\": {\n        \"path\": \"example.txt\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Delete a sandboxed file"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - List Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"listFiles\",\n    \"params\": {\n        \"path\": \".\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "List files in a sandboxed directory"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Zip Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"zipFiles\",\n    \"params\": {\n        \"files\": [\"file1.txt\", \"file2.txt\"],\n        \"output\": \"archive.zip\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Compress multiple sandboxed files into a .zip archive"
+          },
+          "response": []
+        },
+        {
+          "name": "Call Tool - Unzip File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"unzipFile\",\n    \"params\": {\n        \"archive\": \"archive.zip\",\n        \"outputDir\": \"extracted\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["call"]
+            },
+            "description": "Extract a .zip archive into the sandbox"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MCP (Model Context Protocol)",
+      "item": [
+        {
+          "name": "MCP Initialize",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"init\",\n    \"method\": \"initialize\",\n    \"params\": {\n        \"protocolVersion\": \"2024-11-05\",\n        \"capabilities\": {},\n        \"clientInfo\": {\n            \"name\": \"LM Studio Client\",\n            \"version\": \"1.0.0\"\n        }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "initialize"]
+            },
+            "description": "Initialize a Model Context Protocol (MCP) connection"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_list\",\n    \"method\": \"tools/list\",\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "list"]
+            },
+            "description": "Get a list of available tools via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"search\",\n        \"arguments\": {\n            \"query\": \"artificial intelligence\",\n            \"engine\": \"duckduckgo\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a search tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - Math",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"math\",\n        \"arguments\": {\n            \"expr\": \"2 + 2 * 3\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a math tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - Fetch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"fetch\",\n        \"arguments\": {\n            \"url\": \"https://api.github.com/repos/microsoft/vscode\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a fetch tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"files\",\n        \"arguments\": {\n            \"path\": \"example.txt\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a files tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - WriteFile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"writeFile\",\n        \"arguments\": {\n            \"path\": \"example.txt\",\n            \"content\": \"Hello, World!\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a writeFile tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - DeleteFile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"deleteFile\",\n        \"arguments\": {\n            \"path\": \"example.txt\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a deleteFile tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - ListFiles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"listFiles\",\n        \"arguments\": {\n            \"path\": \".\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a listFiles tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - ZipFiles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"zipFiles\",\n        \"arguments\": {\n            \"files\": [\"file1.txt\", \"file2.txt\"],\n            \"output\": \"archive.zip\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a zipFiles tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - UnzipFile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"unzipFile\",\n        \"arguments\": {\n            \"archive\": \"archive.zip\",\n            \"outputDir\": \"extracted\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute an unzipFile tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - CreateDirectory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"createDirectory\",\n        \"arguments\": {\n            \"path\": \"new-folder\",\n            \"recursive\": true\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a createDirectory tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - Grep",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"grep\",\n        \"arguments\": {\n            \"pattern\": \"function\",\n            \"path\": \"script.js\",\n            \"caseSensitive\": false\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute a grep tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Tools Call - ExecuteCommand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"tools_call\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"executeCommand\",\n        \"arguments\": {\n            \"command\": \"ls\",\n            \"args\": [\"-la\"],\n            \"workingDirectory\": \".\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/tools/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "tools", "call"]
+            },
+            "description": "Execute an executeCommand tool via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Resources List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"resources_list\",\n    \"method\": \"resources/list\",\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/resources/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "resources", "list"]
+            },
+            "description": "Get a list of available resources (files) via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Resources Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"resources_read\",\n    \"method\": \"resources/read\",\n    \"params\": {\n        \"uri\": \"example.txt\"\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/resources/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "resources", "read"]
+            },
+            "description": "Read a resource (file) via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Prompts List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"prompts_list\",\n    \"method\": \"prompts/list\",\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/prompts/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "prompts", "list"]
+            },
+            "description": "Get a list of available prompt templates via MCP protocol"
+          },
+          "response": []
+        },
+        {
+          "name": "MCP Prompts Get",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"id\": \"prompts_get\",\n    \"method\": \"prompts/get\",\n    \"params\": {\n        \"name\": \"search_and_analyze\",\n        \"arguments\": {\n            \"query\": \"machine learning\"\n        }\n    },\n    \"connectionId\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mcp/prompts/get",
+              "host": ["{{baseUrl}}"],
+              "path": ["mcp", "prompts", "get"]
+            },
+            "description": "Get a prompt template via MCP protocol"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "wsBaseUrl",
+      "value": "ws://localhost:3001",
+      "type": "string"
+    }
+  ]
+}

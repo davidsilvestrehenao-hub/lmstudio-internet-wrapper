@@ -1,0 +1,194 @@
+---
+description: Use## Overview
+Enforce structured JSON communication between the server and LM Studio. All interactions must use predefined JSON schemas for requests and responses.
+
+## Requirements
+
+### Request Format
+All requests to LM Studio must include:
+```typescript
+{
+  model: "local-model",
+  messages: Message[],
+  stream?: boolean,
+  response_format: {
+    type: "json_object"
+  }
+}
+```
+
+### Response Format
+All model responses must be valid JSON objects following:
+```typescript
+{
+  action: string,    // Name of the tool to call
+  params: object     // Parameters matching tool's schema
+}
+```
+
+### Response Handling
+1. Direct responses must be valid JSON objects
+2. Streaming responses must be normalized into:
+   ```typescript
+   | { type: "chunk", data: string }
+   | { type: "action", data: object }
+   | { type: "error", error: string }
+   | { type: "done" }
+   ```
+
+## Validation
+
+1. Response Format
+   - [ ] All LM Studio requests include `response_format`
+   - [ ] System prompts enforce JSON structure
+   - [ ] Response parser validates JSON format
+
+2. Tool Integration
+   - [ ] Tool schemas included in system prompt
+   - [ ] Tool calls validated against schemas
+   - [ ] Error handling for invalid JSON
+
+## Implementation
+
+### System Prompt Builder
+```typescript
+function toolPrompt(): string {
+  return `You are a tool-using model.
+Always respond ONLY with valid JSON:
+{
+  "action": "<tool name>",
+  "params": {
+    // Parameters matching the tool's schema
+  }
+}
+
+Available tools:
+${formatToolDescriptions(tools)}`;
+}
+```
+
+### Response Parser
+```typescript
+function parseResponse(response: any) {
+  const content = response.choices?.[0]?.message?.content;
+  if (!content) return null;
+
+  try {
+    return JSON.parse(content);
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
+}
+```
+
+## References
+- [LM Studio API](https://github.com/lmstudio-ai)
+- [JSON Schema](https://json-schema.org/).js, npm, pnpm, or vite.
+globs: 
+alwaysApply: true
+---
+
+---
+id: LM-001
+name: LM Studio Structured Tool Calls
+description: Enforce structured JSON communication with LM Studio
+category: integration
+severity: required
+affects: ["server.ts", "client.ts"]
+validates: ["server.ts", "client.ts"]
+alwaysApply: true
+autoFix: false
+---
+
+# LM Studio JSON Protocol
+
+## Overview
+Enforce structured JSON communication between the server and LM Studio. All interactions must use predefined JSON schemas for requests and responses.
+
+LM Studio doesn’t yet support OpenAI’s full `tools` / `function_call` schema,
+but this rule enforces an approach that works reliably.
+
+## Requirements
+
+1. **Request Body Update**
+   Always update the LM Studio fetch request (both streaming and non-streaming) to include:
+
+   ```ts
+   body: JSON.stringify({
+     model: "local-model",
+     messages,
+     stream: true,
+     response_format: { type: "json_object" } // force JSON
+   })
+
+	2.	System Prompt Builder
+Replace free-text system instructions with a strict JSON schema. Use this
+implementation of toolPrompt():
+
+function toolPrompt(): string {
+  return `You are a tool-using model. 
+Always respond ONLY with a valid JSON object following this schema:
+
+{
+  "action": "<tool name>",
+  "params": { ... }
+}
+
+Available tools:
+${Object.values(tools).map(
+    (t) =>
+      `- ${t.name}: ${t.description}\n  Params: ${JSON.stringify(
+        t.schema.properties,
+        null,
+        2
+      )}`
+  ).join("\n")}
+`;
+}
+
+
+	3.	Parser
+LM Studio will now emit pure JSON objects inside choices[0].message.content.
+Regex parsing is no longer required. Instead, use:
+
+const text =
+  parsed.choices?.[0]?.delta?.content ??
+  parsed.choices?.[0]?.message?.content ??
+  "";
+if (text) {
+  try {
+    const json = JSON.parse(text);
+    yield { type: "action", data: json };
+  } catch {
+    yield { type: "chunk", data: text }; // fallback if model leaks text
+  }
+}
+
+
+	4.	Example Response
+Models must output only valid JSON objects. Example:
+
+{
+  "action": "files",
+  "params": { "path": "sandbox/example.txt" }
+}
+
+No narration, no natural language — just structured JSON.
+The server should detect type: "action" events and invoke tools
+immediately.
+
+Enforcement
+	•	Cursor must ensure README.md includes a “Structured Tool Calls with LM Studio”
+section that documents these steps exactly.
+	•	All code snippets above must be included verbatim inside fenced blocks.
+	•	Do not paraphrase JSON or TypeScript — preserve exact syntax.
+
+Next Step
+
+Optionally, the server can be extended to automatically execute tool calls and
+stream results back to the model, enabling multi-step tool-use chains
+instead of one-shot calls.
+
+---
+
+Do you want me to now **draft the README.md skeleton** that Cursor will generate using this rule, so you have the baseline file right away?

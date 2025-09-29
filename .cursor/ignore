@@ -1,0 +1,20 @@
+# Ignore sandbox and generated artifacts
+sandbox/**
+*.zip
+*.tar
+*.tar.gz
+
+# Ignore Node/Bun build outputs
+node_modules/**
+dist/**
+build/**
+.out/**
+.cache/**
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/**

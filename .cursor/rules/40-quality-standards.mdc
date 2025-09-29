@@ -1,0 +1,147 @@
+---
+description: Code Quality Standards and Mandate
+globs: "**/*.{ts,tsx,js,jsx}"
+alwaysApply: true
+type: Auto Attached
+---
+
+# Code Quality Standards & Mandate
+
+## 🎯 **Zero Tolerance Policy**
+
+This project maintains **ZERO TOLERANCE** for code quality issues. All code must meet the highest standards before being committed. A "justified suppressions" approach is acceptable, recognizing that some ESLint rules have legitimate false positives or necessary exceptions in specific contexts. This maintains code quality while being pragmatic about real-world development needs.
+
+### **Mandatory Quality Checks**
+
+1. **Prettier Formatting**: All code must be perfectly formatted
+2. **ESLint Compliance**: Zero warnings or errors allowed
+3. **TypeScript Safety**: No `any` types without proper justification
+4. **ESLint Disable Justification**: All `eslint-disable` comments must have clear justifications
+
+## 📋 **Code Quality Checklist**
+
+### **Before Every Commit**
+
+```bash
+# Format code
+bun run format
+
+# Check formatting
+bun run format:check
+
+# Lint code
+bun run lint:check
+
+# Type check
+bun run type-check
+
+# All must pass with ZERO errors/warnings
+```
+
+### **TypeScript Standards**
+
+- **Minimal `any` types**: Use proper TypeScript interfaces whenever possible
+- **Justified `any` usage**: When `any` is necessary (e.g., dynamic service loading), provide clear justification
+- **ESLint Disable Justification**: Every `eslint-disable` comment must have a clear explanation
+- **Strict Type Checking**: Enable all strict TypeScript options
+
+### **ESLint Disable Justification Standards**
+
+- **Mandatory Justification**: Every `eslint-disable` comment must be preceded by a clear explanation
+- **Justification Format**: Use `// Justification: [Clear explanation of why the disable is necessary]`
+- **Common Justified Cases**:
+  - Dynamic service loading requiring `any` types
+  - Third-party library types that don't match our interfaces
+  - Legacy code migration periods
+- **Positioning**: Place disable comments on the exact line being suppressed
+- **Review Required**: All disable justifications must be reviewed and approved
+
+## 🚫 **Anti-Patterns to Avoid**
+
+### **Code Quality Anti-Patterns**
+
+- Using `any` types without proper justification
+- Using `eslint-disable` without clear explanations
+- Unjustified ESLint suppressions
+- Ignoring TypeScript errors
+- Poor variable naming
+- Lack of error handling
+- Missing return type annotations
+
+## ✅ **Best Practices**
+
+### **Code Quality**
+
+- Write self-documenting code with clear variable names
+- Implement proper error handling and logging
+- Follow consistent naming conventions
+- Write comprehensive tests for all functionality
+- Justify all ESLint disable comments with clear explanations
+- Document why `any` types are necessary when used
+- Use explicit return types for functions
+- Prefer `const` over `let` when possible
+- Use meaningful function and variable names
+- Keep functions small and focused
+
+### **TypeScript Best Practices**
+
+- Define interfaces for all data structures
+- Use union types instead of `any` when possible
+- Leverage TypeScript's strict mode
+- Use type guards for runtime type checking
+- Prefer type assertions over type casting
+- Use generic types for reusable code
+
+## 🔍 **Code Review Standards**
+
+### **Required Checks**
+
+1. **Formatting**: Code must pass Prettier formatting
+2. **Linting**: Zero ESLint warnings or errors
+3. **Type Safety**: No TypeScript errors, minimal justified `any` types
+4. **ESLint Disable Justification**: All disable comments have clear explanations
+5. **Testing**: Adequate test coverage and quality
+6. **Documentation**: Clear comments and documentation
+7. **Error Handling**: Proper error handling and edge cases covered
+
+### **Review Process**
+
+1. Automated checks must pass (format, lint, type-check)
+2. Manual review for code quality and best practices
+3. Test coverage verification
+4. Performance impact assessment
+5. Security review for sensitive operations
+
+## 🎯 **Success Metrics**
+
+### **Quality Metrics**
+
+- **0** ESLint warnings or errors
+- **0** TypeScript errors
+- **100%** Prettier formatting compliance
+- **Minimal justified `any` types** in production code
+- **100% justified `eslint-disable` comments** with clear explanations
+- **High test coverage** for critical functionality
+- **Clear documentation** for complex logic
+
+## 🚀 **Continuous Improvement**
+
+### **Regular Audits**
+
+- Weekly code quality reviews
+- Monthly ESLint rule effectiveness checks
+- Quarterly performance assessments
+- Annual security audits
+
+### **Tool Integration**
+
+- Pre-commit hooks for quality checks
+- CI/CD pipeline with quality gates
+- Automated testing on every commit
+- Code quality monitoring in production
+
+### **Quality Standards Evolution**
+
+The project has evolved from a "zero tolerance" approach to a "justified suppressions" approach, recognizing that some ESLint rules have legitimate false positives or necessary exceptions in specific contexts. This maintains code quality while being pragmatic about real-world development needs.
+
+Remember: **Quality is not negotiable**. Every line of code must meet these standards before being committed to the repository.

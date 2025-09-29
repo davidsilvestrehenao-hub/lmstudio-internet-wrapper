@@ -1,0 +1,458 @@
+{
+  "info": {
+    "name": "LM Studio API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Complete API collection for LM Studio OpenAI-compatible and REST endpoints. Based on official LM Studio documentation."
+  },
+  "item": [
+    {
+      "name": "OpenAI Compatible API",
+      "item": [
+        {
+          "name": "Models",
+          "item": [
+            {
+              "name": "List Models",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/models",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "models"]
+                },
+                "description": "Lists the currently loaded models in LM Studio"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Chat Completions",
+          "item": [
+            {
+              "name": "Chat Completion (Non-streaming)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Always answer in rhymes.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Introduce yourself.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 1000\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "chat", "completions"]
+                },
+                "description": "Send a chat history and receive the assistant's response. Prompt template is applied automatically."
+              },
+              "response": []
+            },
+            {
+              "name": "Chat Completion (Streaming)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a short story about a robot.\"\n    }\n  ],\n  \"stream\": true,\n  \"temperature\": 0.7\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "chat", "completions"]
+                },
+                "description": "Streaming chat completion with Server-Sent Events (SSE). Use with tools like curl or streaming-capable clients."
+              },
+              "response": []
+            },
+            {
+              "name": "Chat Completion with Structured Output",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant that returns data in JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Create a list of 3 programming languages with their primary use cases.\"\n    }\n  ],\n  \"response_format\": {\n    \"type\": \"json_object\"\n  },\n  \"temperature\": 0.3\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "chat", "completions"]
+                },
+                "description": "Force the model to return structured JSON output using response_format parameter."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Completions",
+          "item": [
+            {
+              "name": "Text Completion",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"prompt\": \"The future of artificial intelligence is\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 100,\n  \"stop\": [\".\", \"!\", \"?\"]\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "completions"]
+                },
+                "description": "Send a string and get the model's continuation. Best used with base models rather than chat-tuned models. Prompt template will NOT be applied."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Embeddings",
+          "item": [
+            {
+              "name": "Create Embeddings",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{embeddingModelId}}\",\n  \"input\": [\n    \"Once upon a time, there was a cat.\",\n    \"The cat lived in a small house.\"\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/embeddings",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "embeddings"]
+                },
+                "description": "Send a string or array of strings and get text embeddings (vector representations)."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Single Embedding",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{embeddingModelId}}\",\n  \"input\": \"Machine learning is a subset of artificial intelligence.\"\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/embeddings",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "embeddings"]
+                },
+                "description": "Create embeddings for a single text string."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LM Studio REST API (Beta)",
+      "item": [
+        {
+          "name": "Models",
+          "item": [
+            {
+              "name": "List All Models",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/models",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "models"]
+                },
+                "description": "Get a list of all available models (both loaded and unloaded)"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Specific Model",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/models/{{modelId}}",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "models", "{{modelId}}"]
+                },
+                "description": "Get detailed information about a specific model including architecture, quantization, and context length"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Chat Completions",
+          "item": [
+            {
+              "name": "REST Chat Completion",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Explain quantum computing in simple terms.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 500,\n  \"stream\": false\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "chat", "completions"]
+                },
+                "description": "LM Studio's native REST API for chat completions with additional metadata in response"
+              },
+              "response": []
+            },
+            {
+              "name": "REST Chat Completion (Streaming)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a creative story about space exploration.\"\n    }\n  ],\n  \"temperature\": 0.8,\n  \"stream\": true\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "chat", "completions"]
+                },
+                "description": "Streaming chat completion using LM Studio's REST API"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Completions",
+          "item": [
+            {
+              "name": "REST Text Completion",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"prompt\": \"In the year 2050, technology will\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 150\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "completions"]
+                },
+                "description": "Text completion using LM Studio's REST API with enhanced response metadata"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Embeddings",
+          "item": [
+            {
+              "name": "REST Embeddings",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{embeddingModelId}}\",\n  \"input\": \"Artificial intelligence is transforming the way we work and live.\"\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/api/v0/embeddings",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["api", "v0", "embeddings"]
+                },
+                "description": "Create embeddings using LM Studio's REST API"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tools and Function Calling",
+      "item": [
+        {
+          "name": "Tools with Chat Completion",
+          "item": [
+            {
+              "name": "Chat with Tools (OpenAI Format)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What's the weather like today?\"\n    }\n  ],\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a location\",\n        \"parameters\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"location\": {\n              \"type\": \"string\",\n              \"description\": \"The city and state, e.g. San Francisco, CA\"\n            }\n          },\n          \"required\": [\"location\"]\n        }\n      }\n    }\n  ],\n  \"tool_choice\": \"auto\",\n  \"temperature\": 0.7\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "chat", "completions"]
+                },
+                "description": "Chat completion with function calling capabilities using OpenAI's tools format"
+              },
+              "response": []
+            },
+            {
+              "name": "Tool Call Response",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What's the weather like today?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"tool_calls\": [\n        {\n          \"id\": \"call_123\",\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"get_weather\",\n            \"arguments\": \"{\\\"location\\\": \\\"San Francisco, CA\\\"}\"\n          }\n        }\n      ]\n    },\n    {\n      \"role\": \"tool\",\n      \"tool_call_id\": \"call_123\",\n      \"content\": \"The weather in San Francisco, CA is sunny with a temperature of 72°F.\"\n    }\n  ],\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a location\",\n        \"parameters\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"location\": {\n              \"type\": \"string\",\n              \"description\": \"The city and state, e.g. San Francisco, CA\"\n            }\n          },\n          \"required\": [\"location\"]\n        }\n      }\n    }\n  ],\n  \"temperature\": 0.7\n}"
+                },
+                "url": {
+                  "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+                  "host": ["{{lmStudioBaseUrl}}"],
+                  "path": ["v1", "chat", "completions"]
+                },
+                "description": "Follow-up message after executing a tool call, providing the tool result to get the final response"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Advanced Parameters",
+      "item": [
+        {
+          "name": "Advanced Chat Completion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a detailed technical explanation.\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"max_tokens\": 2000,\n  \"top_p\": 0.9,\n  \"top_k\": 40,\n  \"presence_penalty\": 0.1,\n  \"frequency_penalty\": 0.1,\n  \"repeat_penalty\": 1.1,\n  \"stop\": [\"\\n\\n\", \"###\"],\n  \"seed\": 42\n}"
+            },
+            "url": {
+              "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+              "host": ["{{lmStudioBaseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            },
+            "description": "Chat completion with all available parameters for fine-tuning model behavior"
+          },
+          "response": []
+        },
+        {
+          "name": "Chat with Logit Bias",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"{{modelId}}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write about technology.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"logit_bias\": {\n    \"1234\": 2.0,\n    \"5678\": -1.0\n  }\n}"
+            },
+            "url": {
+              "raw": "{{lmStudioBaseUrl}}/v1/chat/completions",
+              "host": ["{{lmStudioBaseUrl}}"],
+              "path": ["v1", "chat", "completions"]
+            },
+            "description": "Example of using logit_bias to influence token probabilities (token IDs are model-specific)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "lmStudioBaseUrl",
+      "value": "http://localhost:1234",
+      "type": "string",
+      "description": "Base URL for LM Studio server (default port 1234)"
+    },
+    {
+      "key": "modelId",
+      "value": "your-model-identifier",
+      "type": "string",
+      "description": "Model identifier from LM Studio (get from /v1/models endpoint)"
+    },
+    {
+      "key": "embeddingModelId",
+      "value": "text-embedding-model",
+      "type": "string",
+      "description": "Embedding model identifier (get from /v1/models endpoint)"
+    }
+  ]
+}

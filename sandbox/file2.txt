@@ -1,0 +1,3 @@
+This is the second test file.
+It contains different content for testing.
+This file can be used to test zip operations and file comparisons.

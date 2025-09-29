@@ -1,0 +1,1075 @@
+openapi: 3.1.0
+info:
+  title: LM Studio Internet Wrapper API
+  version: 3.1.0
+  description: API for interacting with LM Studio with internet access and tool capabilities
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+
+    HealthCheck:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        version:
+          type: string
+        checks:
+          type: object
+          properties:
+            lmStudio:
+              type: boolean
+            tools:
+              type: boolean
+
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+        content:
+          type: string
+
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    RateLimit:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Too many requests
+              retryAfter:
+                type: number
+                description: Number of seconds to wait before retrying
+                example: 60
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Get the health status of the API and its dependencies
+      operationId: health
+      tags:
+        - System
+      responses:
+        "200":
+          description: Health check response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheck"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /chat:
+    post:
+      summary: Chat with LM Studio (Automated Tool Execution)
+      description: |
+        Send messages to LM Studio with automatic tool execution. 
+        LM Studio will automatically execute tools when it returns JSON tool calls.
+        Supports up to 5 iterations of tool calling per conversation.
+      operationId: chat
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ChatMessage"
+                stream:
+                  type: boolean
+                  default: true
+            examples:
+              simple_query:
+                summary: Simple query with automatic tool usage
+                value:
+                  messages:
+                    - role: user
+                      content: "Search for information about artificial intelligence"
+                  stream: true
+              multi_tool_workflow:
+                summary: Multi-tool workflow example
+                value:
+                  messages:
+                    - role: user
+                      content: "Search for 'machine learning', then write a summary to a file called 'ml_summary.txt'"
+                  stream: true
+      responses:
+        "200":
+          description: Chat response with automatic tool execution
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chunks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: [chunk, action, done, error]
+                        data:
+                          type: string
+                        error:
+                          type: string
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [chunk, action, done, error]
+                  data:
+                    type: string
+                  error:
+                    type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /chat/legacy:
+    post:
+      summary: Chat with LM Studio (Legacy - Manual Tool Calling)
+      description: |
+        Send messages to LM Studio without automatic tool execution.
+        Use this endpoint if you want to manually handle tool calls.
+        LM Studio will return JSON tool calls that you must execute via /call endpoint.
+      operationId: chatLegacy
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ChatMessage"
+                stream:
+                  type: boolean
+                  default: true
+      responses:
+        "200":
+          description: Chat response (manual tool calling)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  choices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          $ref: "#/components/schemas/ChatMessage"
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [chunk, action, done, error]
+                  data:
+                    type: string
+                  error:
+                    type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/initialize:
+    post:
+      summary: Initialize MCP Connection
+      description: Initialize a Model Context Protocol (MCP) connection
+      operationId: mcpInitialize
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["initialize"]
+                params:
+                  type: object
+                  properties:
+                    protocolVersion:
+                      type: string
+                      enum: ["2024-11-05"]
+                    capabilities:
+                      type: object
+                    clientInfo:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        version:
+                          type: string
+            examples:
+              initialize:
+                summary: Initialize MCP connection
+                value:
+                  jsonrpc: "2.0"
+                  id: "init"
+                  method: "initialize"
+                  params:
+                    protocolVersion: "2024-11-05"
+                    capabilities: {}
+                    clientInfo:
+                      name: "LM Studio Client"
+                      version: "1.0.0"
+      responses:
+        "200":
+          description: MCP initialization response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      protocolVersion:
+                        type: string
+                      capabilities:
+                        type: object
+                      serverInfo:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          version:
+                            type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/tools/list:
+    post:
+      summary: List MCP Tools
+      description: Get a list of available tools via MCP protocol
+      operationId: mcpToolsList
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["tools/list"]
+                connectionId:
+                  type: string
+            examples:
+              list_tools:
+                summary: List available tools
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_list"
+                  method: "tools/list"
+                  connectionId: "default"
+      responses:
+        "200":
+          description: List of MCP tools
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      tools:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            inputSchema:
+                              type: object
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/tools/call:
+    post:
+      summary: Call MCP Tool
+      description: Execute a tool via MCP protocol
+      operationId: mcpToolsCall
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["tools/call"]
+                params:
+                  type: object
+                  required: [name, arguments]
+                  properties:
+                    name:
+                      type: string
+                    arguments:
+                      type: object
+                connectionId:
+                  type: string
+            examples:
+              call_search:
+                summary: Call search tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "search"
+                    arguments:
+                      query: "artificial intelligence"
+                      engine: "duckduckgo"
+                  connectionId: "default"
+              call_math:
+                summary: Call math tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "math"
+                    arguments:
+                      expr: "2 + 2 * 3"
+                  connectionId: "default"
+              call_fetch:
+                summary: Call fetch tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "fetch"
+                    arguments:
+                      url: "https://api.github.com/repos/microsoft/vscode"
+                  connectionId: "default"
+              call_files:
+                summary: Call files tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "files"
+                    arguments:
+                      path: "example.txt"
+                  connectionId: "default"
+              call_writeFile:
+                summary: Call writeFile tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "writeFile"
+                    arguments:
+                      path: "example.txt"
+                      content: "Hello, World!"
+                  connectionId: "default"
+              call_deleteFile:
+                summary: Call deleteFile tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "deleteFile"
+                    arguments:
+                      path: "example.txt"
+                  connectionId: "default"
+              call_listFiles:
+                summary: Call listFiles tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "listFiles"
+                    arguments:
+                      path: "."
+                  connectionId: "default"
+              call_zipFiles:
+                summary: Call zipFiles tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "zipFiles"
+                    arguments:
+                      files: ["file1.txt", "file2.txt"]
+                      output: "archive.zip"
+                  connectionId: "default"
+              call_unzipFile:
+                summary: Call unzipFile tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "unzipFile"
+                    arguments:
+                      archive: "archive.zip"
+                      outputDir: "extracted"
+                  connectionId: "default"
+              call_createDirectory:
+                summary: Call createDirectory tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "createDirectory"
+                    arguments:
+                      path: "new-folder"
+                      recursive: true
+                  connectionId: "default"
+              call_grep:
+                summary: Call grep tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "grep"
+                    arguments:
+                      pattern: "function"
+                      path: "script.js"
+                      caseSensitive: false
+                  connectionId: "default"
+              call_executeCommand:
+                summary: Call executeCommand tool
+                value:
+                  jsonrpc: "2.0"
+                  id: "tools_call"
+                  method: "tools/call"
+                  params:
+                    name: "executeCommand"
+                    arguments:
+                      command: "ls"
+                      args: ["-la"]
+                      workingDirectory: "."
+                  connectionId: "default"
+      responses:
+        "200":
+          description: Tool execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: ["text"]
+                            text:
+                              type: string
+                      isError:
+                        type: boolean
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/resources/list:
+    post:
+      summary: List MCP Resources
+      description: Get a list of available resources (files) via MCP protocol
+      operationId: mcpResourcesList
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["resources/list"]
+                connectionId:
+                  type: string
+      responses:
+        "200":
+          description: List of MCP resources
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      resources:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            uri:
+                              type: string
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            mimeType:
+                              type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/resources/read:
+    post:
+      summary: Read MCP Resource
+      description: Read a resource (file) via MCP protocol
+      operationId: mcpResourcesRead
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["resources/read"]
+                params:
+                  type: object
+                  required: [uri]
+                  properties:
+                    uri:
+                      type: string
+                connectionId:
+                  type: string
+            examples:
+              read_file:
+                summary: Read a file resource
+                value:
+                  jsonrpc: "2.0"
+                  id: "resources_read"
+                  method: "resources/read"
+                  params:
+                    uri: "example.txt"
+                  connectionId: "default"
+      responses:
+        "200":
+          description: Resource contents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      uri:
+                        type: string
+                      mimeType:
+                        type: string
+                      text:
+                        type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/prompts/list:
+    post:
+      summary: List MCP Prompts
+      description: Get a list of available prompt templates via MCP protocol
+      operationId: mcpPromptsList
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["prompts/list"]
+                connectionId:
+                  type: string
+      responses:
+        "200":
+          description: List of MCP prompts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      prompts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            arguments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  description:
+                                    type: string
+                                  required:
+                                    type: boolean
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /mcp/prompts/get:
+    post:
+      summary: Get MCP Prompt
+      description: Get a prompt template via MCP protocol
+      operationId: mcpPromptsGet
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params]
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  type: string
+                method:
+                  type: string
+                  enum: ["prompts/get"]
+                params:
+                  type: object
+                  required: [name]
+                  properties:
+                    name:
+                      type: string
+                    arguments:
+                      type: object
+                connectionId:
+                  type: string
+            examples:
+              get_prompt:
+                summary: Get a prompt template
+                value:
+                  jsonrpc: "2.0"
+                  id: "prompts_get"
+                  method: "prompts/get"
+                  params:
+                    name: "search_and_analyze"
+                    arguments:
+                      query: "machine learning"
+                  connectionId: "default"
+      responses:
+        "200":
+          description: Prompt template
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    enum: ["2.0"]
+                  id:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                      messages:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            role:
+                              type: string
+                              enum: ["user", "assistant", "system"]
+                            content:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum: ["text"]
+                                text:
+                                  type: string
+        "400":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /ws:
+    get:
+      summary: WebSocket endpoint for chat
+      description: |
+        Connect via WebSocket for real-time chat communication.
+
+        The WebSocket connection supports the following messages:
+        - Client -> Server: { messages: ChatMessage[] }
+        - Server -> Client: { type: "chunk" | "done" | "error", data?: string, error?: string }
+
+        The server also implements a ping/pong mechanism to keep the connection alive.
+      operationId: websocket
+      tags:
+        - Chat
+      responses:
+        "101":
+          description: WebSocket upgrade successful
+        "400":
+          $ref: "#/components/responses/Error"
+
+  /tools:
+    get:
+      summary: List available tools
+      description: Get a list of all available tools and their metadata
+      operationId: listTools
+      tags:
+        - Tools
+      responses:
+        "200":
+          description: List of tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [name, description, schema]
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    schema:
+                      type: object
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/Error"
+
+  /call:
+    post:
+      summary: Call a tool
+      description: Execute a specific tool with parameters
+      operationId: callTool
+      tags:
+        - Tools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum:
+                    [
+                      math,
+                      search,
+                      fetch,
+                      files,
+                      writeFile,
+                      deleteFile,
+                      listFiles,
+                      zipFiles,
+                      unzipFile,
+                    ]
+                  description: Name of the tool to execute
+                params:
+                  type: object
+                  description: Parameters specific to the tool
+            examples:
+              math:
+                summary: Math tool example
+                value:
+                  action: math
+                  params:
+                    expr: "2 + 2 * 3"
+              search_duckduckgo:
+                summary: Search with DuckDuckGo
+                value:
+                  action: search
+                  params:
+                    query: "artificial intelligence"
+                    engine: "duckduckgo"
+              search_google:
+                summary: Search with Google
+                value:
+                  action: search
+                  params:
+                    query: "machine learning"
+                    engine: "google"
+              search_bing:
+                summary: Search with Bing
+                value:
+                  action: search
+                  params:
+                    query: "neural networks"
+                    engine: "bing"
+              search_brave:
+                summary: Search with Brave
+                value:
+                  action: search
+                  params:
+                    query: "deep learning"
+                    engine: "brave"
+              fetch:
+                summary: Fetch web content
+                value:
+                  action: fetch
+                  params:
+                    url: "https://httpbin.org/json"
+              files:
+                summary: Read file content
+                value:
+                  action: files
+                  params:
+                    path: "example.txt"
+              writeFile:
+                summary: Write file content
+                value:
+                  action: writeFile
+                  params:
+                    path: "example.txt"
+                    content: "Hello, World!"
+              deleteFile:
+                summary: Delete a file
+                value:
+                  action: deleteFile
+                  params:
+                    path: "example.txt"
+              listFiles:
+                summary: List directory contents
+                value:
+                  action: listFiles
+                  params:
+                    path: "."
+              zipFiles:
+                summary: Create zip archive
+                value:
+                  action: zipFiles
+                  params:
+                    files: ["file1.txt", "file2.txt"]
+                    output: "archive.zip"
+              unzipFile:
+                summary: Extract zip archive
+                value:
+                  action: unzipFile
+                  params:
+                    archive: "archive.zip"
+                    outputDir: "extracted"
+              createDirectory:
+                summary: Create a directory
+                value:
+                  action: createDirectory
+                  params:
+                    path: "new-folder"
+                    recursive: true
+              grep:
+                summary: Search for text in files
+                value:
+                  action: grep
+                  params:
+                    pattern: "function"
+                    path: "script.js"
+                    caseSensitive: false
+              executeCommand:
+                summary: Execute a shell command
+                value:
+                  action: executeCommand
+                  params:
+                    command: "ls"
+                    args: ["-la"]
+                    workingDirectory: "."
+      responses:
+        "200":
+          description: Tool execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                examples:
+                  math_result:
+                    summary: Math calculation result
+                    value:
+                      result: "8"
+                  search_result:
+                    summary: Search results
+                    value:
+                      result: '{"query":"artificial intelligence","engine":"duckduckgo","results":[{"title":"Artificial Intelligence","url":"https://example.com","snippet":"AI description","source":"DuckDuckGo"}],"count":1}'
+                  file_result:
+                    summary: File operation result
+                    value:
+                      result: "File written successfully: /path/to/sandbox/example.txt"
+        "400":
+          description: Unknown tool or invalid parameters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - example:
+                      error: Unknown tool or invalid parameters
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/Error"

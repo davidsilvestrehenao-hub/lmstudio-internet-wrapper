@@ -1,0 +1,203 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-09-28T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_health_check",
+      "parentId": "fld_system",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "url": "{{ _.base_url }}/health",
+      "name": "Health Check",
+      "description": "Get the health status of the API and its dependencies",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695859200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_system",
+      "parentId": "wrk_lmstudio",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "name": "System",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695859200000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_lmstudio",
+      "parentId": null,
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "name": "LM Studio Internet Wrapper API",
+      "description": "",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "req_chat",
+      "parentId": "fld_chat",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "url": "{{ _.base_url }}/chat",
+      "name": "Chat with LM Studio (SSE)",
+      "description": "Send messages to LM Studio and receive responses via Server-Sent Events (SSE).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Hello!\"\n    }\n  ],\n  \"stream\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695859200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_chat",
+      "parentId": "wrk_lmstudio",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "name": "Chat",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695859100000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "ws_chat",
+      "parentId": "fld_chat",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "url": "{{ _.ws_base_url }}/ws",
+      "name": "WebSocket Chat",
+      "description": "Connect via WebSocket for real-time chat communication",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695859100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "websocket_request"
+    },
+    {
+      "_id": "req_list_tools",
+      "parentId": "fld_tools",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "url": "{{ _.base_url }}/tools",
+      "name": "List Tools",
+      "description": "Get a list of all available tools and their metadata",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695859200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_tools",
+      "parentId": "wrk_lmstudio",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "name": "Tools",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695859000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_call_tool",
+      "parentId": "fld_tools",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "url": "{{ _.base_url }}/call",
+      "name": "Call Tool",
+      "description": "Execute a specific tool with parameters",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"action\": \"tool_name\",\n  \"params\": {\n    \"param1\": \"value1\"\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695859100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_lmstudio",
+      "modified": 1695859200000,
+      "created": 1695859200000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "ws_base_url": "ws://localhost:3001"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "ws_base_url"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1695859200000,
+      "_type": "environment"
+    }
+  ]
+}

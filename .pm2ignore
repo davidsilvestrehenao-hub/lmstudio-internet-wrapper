@@ -1,0 +1,63 @@
+# PM2 ignore file
+# Files and directories to ignore when PM2 watches for changes
+
+# Dependencies
+node_modules/
+bun.lock
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# PM2 files
+ecosystem.config.js
+.pm2/
+
+# Documentation
+README.md
+*.md
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/

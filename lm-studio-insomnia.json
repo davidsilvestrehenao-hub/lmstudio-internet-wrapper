@@ -1,0 +1,696 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-01-27T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_lmstudio",
+      "parentId": null,
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "LM Studio API Collection",
+      "description": "Complete API collection for LM Studio OpenAI-compatible and REST endpoints. Based on official LM Studio documentation.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_lmstudio",
+      "parentId": "wrk_lmstudio",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "LM Studio Environment",
+      "data": {
+        "lmStudioBaseUrl": "http://localhost:1234",
+        "modelId": "your-model-identifier",
+        "embeddingModelId": "text-embedding-model"
+      },
+      "dataPropertyOrder": {
+        "&": ["lmStudioBaseUrl", "modelId", "embeddingModelId"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1737984000000,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_openai_compatible",
+      "parentId": "wrk_lmstudio",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "OpenAI Compatible API",
+      "description": "OpenAI-compatible endpoints that work with existing OpenAI clients",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737984000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_openai_models",
+      "parentId": "fld_openai_compatible",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Models",
+      "description": "Model management endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737984000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_list_models_openai",
+      "parentId": "fld_openai_models",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/models",
+      "name": "List Models",
+      "description": "Lists the currently loaded models in LM Studio",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_openai_chat",
+      "parentId": "fld_openai_compatible",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Chat Completions",
+      "description": "Chat completion endpoints with various configurations",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983900000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_chat_completion_basic",
+      "parentId": "fld_openai_chat",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Chat Completion (Non-streaming)",
+      "description": "Send a chat history and receive the assistant's response. Prompt template is applied automatically.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Always answer in rhymes.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Introduce yourself.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 1000\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_chat_completion_streaming",
+      "parentId": "fld_openai_chat",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Chat Completion (Streaming)",
+      "description": "Streaming chat completion with Server-Sent Events (SSE). Use with tools like curl or streaming-capable clients.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a short story about a robot.\"\n    }\n  ],\n  \"stream\": true,\n  \"temperature\": 0.7\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_chat_completion_structured",
+      "parentId": "fld_openai_chat",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Chat Completion with Structured Output",
+      "description": "Force the model to return structured JSON output using response_format parameter.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant that returns data in JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Create a list of 3 programming languages with their primary use cases.\"\n    }\n  ],\n  \"response_format\": {\n    \"type\": \"json_object\"\n  },\n  \"temperature\": 0.3\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_openai_completions",
+      "parentId": "fld_openai_compatible",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Completions",
+      "description": "Text completion endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983700000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_text_completion",
+      "parentId": "fld_openai_completions",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/completions",
+      "name": "Text Completion",
+      "description": "Send a string and get the model's continuation. Best used with base models rather than chat-tuned models. Prompt template will NOT be applied.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"prompt\": \"The future of artificial intelligence is\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 100,\n  \"stop\": [\".\", \"!\", \"?\"]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_openai_embeddings",
+      "parentId": "fld_openai_compatible",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Embeddings",
+      "description": "Text embedding endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_embeddings_multiple",
+      "parentId": "fld_openai_embeddings",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/embeddings",
+      "name": "Create Embeddings (Multiple)",
+      "description": "Send an array of strings and get text embeddings (vector representations).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.embeddingModelId }}\",\n  \"input\": [\n    \"Once upon a time, there was a cat.\",\n    \"The cat lived in a small house.\"\n  ]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_embeddings_single",
+      "parentId": "fld_openai_embeddings",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/embeddings",
+      "name": "Create Single Embedding",
+      "description": "Create embeddings for a single text string.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.embeddingModelId }}\",\n  \"input\": \"Machine learning is a subset of artificial intelligence.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_rest_api",
+      "parentId": "wrk_lmstudio",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "LM Studio REST API (Beta)",
+      "description": "LM Studio's native REST API with enhanced metadata",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983500000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_rest_models",
+      "parentId": "fld_rest_api",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Models",
+      "description": "REST API model endpoints with detailed information",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737984000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_rest_list_models",
+      "parentId": "fld_rest_models",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/models",
+      "name": "List All Models",
+      "description": "Get a list of all available models (both loaded and unloaded)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_rest_get_model",
+      "parentId": "fld_rest_models",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/models/{{ _.modelId }}",
+      "name": "Get Specific Model",
+      "description": "Get detailed information about a specific model including architecture, quantization, and context length",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_rest_chat",
+      "parentId": "fld_rest_api",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Chat Completions",
+      "description": "REST API chat completion endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983800000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_rest_chat_completion",
+      "parentId": "fld_rest_chat",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/chat/completions",
+      "name": "REST Chat Completion",
+      "description": "LM Studio's native REST API for chat completions with additional metadata in response",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Explain quantum computing in simple terms.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 500,\n  \"stream\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_rest_chat_streaming",
+      "parentId": "fld_rest_chat",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/chat/completions",
+      "name": "REST Chat Completion (Streaming)",
+      "description": "Streaming chat completion using LM Studio's REST API",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a creative story about space exploration.\"\n    }\n  ],\n  \"temperature\": 0.8,\n  \"stream\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_rest_completions",
+      "parentId": "fld_rest_api",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Completions",
+      "description": "REST API text completion endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983700000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_rest_completion",
+      "parentId": "fld_rest_completions",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/completions",
+      "name": "REST Text Completion",
+      "description": "Text completion using LM Studio's REST API with enhanced response metadata",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"prompt\": \"In the year 2050, technology will\",\n  \"temperature\": 0.7,\n  \"max_tokens\": 150\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_rest_embeddings",
+      "parentId": "fld_rest_api",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Embeddings",
+      "description": "REST API embedding endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_rest_embeddings",
+      "parentId": "fld_rest_embeddings",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/api/v0/embeddings",
+      "name": "REST Embeddings",
+      "description": "Create embeddings using LM Studio's REST API",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.embeddingModelId }}\",\n  \"input\": \"Artificial intelligence is transforming the way we work and live.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_tools",
+      "parentId": "wrk_lmstudio",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Tools and Function Calling",
+      "description": "Function calling and tool integration examples",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983400000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_tool_examples",
+      "parentId": "fld_tools",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Tools with Chat Completion",
+      "description": "Examples of using tools with chat completions",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737984000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_chat_with_tools",
+      "parentId": "fld_tool_examples",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Chat with Tools (OpenAI Format)",
+      "description": "Chat completion with function calling capabilities using OpenAI's tools format",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What's the weather like today?\"\n    }\n  ],\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a location\",\n        \"parameters\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"location\": {\n              \"type\": \"string\",\n              \"description\": \"The city and state, e.g. San Francisco, CA\"\n            }\n          },\n          \"required\": [\"location\"]\n        }\n      }\n    }\n  ],\n  \"tool_choice\": \"auto\",\n  \"temperature\": 0.7\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_tool_call_response",
+      "parentId": "fld_tool_examples",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Tool Call Response",
+      "description": "Follow-up message after executing a tool call, providing the tool result to get the final response",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What's the weather like today?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"tool_calls\": [\n        {\n          \"id\": \"call_123\",\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"get_weather\",\n            \"arguments\": \"{\\\"location\\\": \\\"San Francisco, CA\\\"}\"\n          }\n        }\n      ]\n    },\n    {\n      \"role\": \"tool\",\n      \"tool_call_id\": \"call_123\",\n      \"content\": \"The weather in San Francisco, CA is sunny with a temperature of 72°F.\"\n    }\n  ],\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a location\",\n        \"parameters\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"location\": {\n              \"type\": \"string\",\n              \"description\": \"The city and state, e.g. San Francisco, CA\"\n            }\n          },\n          \"required\": [\"location\"]\n        }\n      }\n    }\n  ],\n  \"temperature\": 0.7\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_advanced",
+      "parentId": "wrk_lmstudio",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "name": "Advanced Parameters",
+      "description": "Advanced parameter examples for fine-tuning model behavior",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1737983300000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_advanced_chat",
+      "parentId": "fld_advanced",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Advanced Chat Completion",
+      "description": "Chat completion with all available parameters for fine-tuning model behavior",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a detailed technical explanation.\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"max_tokens\": 2000,\n  \"top_p\": 0.9,\n  \"top_k\": 40,\n  \"presence_penalty\": 0.1,\n  \"frequency_penalty\": 0.1,\n  \"repeat_penalty\": 1.1,\n  \"stop\": [\"\\n\\n\", \"###\"],\n  \"seed\": 42\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737984000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_logit_bias",
+      "parentId": "fld_advanced",
+      "modified": 1737984000000,
+      "created": 1737984000000,
+      "url": "{{ _.lmStudioBaseUrl }}/v1/chat/completions",
+      "name": "Chat with Logit Bias",
+      "description": "Example of using logit_bias to influence token probabilities (token IDs are model-specific)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"model\": \"{{ _.modelId }}\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write about technology.\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"logit_bias\": {\n    \"1234\": 2.0,\n    \"5678\": -1.0\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1737983900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}

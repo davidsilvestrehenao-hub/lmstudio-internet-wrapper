@@ -1,0 +1,75 @@
+---
+id: ARCH-001
+name: LM Studio Integration Architecture
+description: Core architecture and requirements for LM Studio wrapper
+category: architecture
+severity: required
+affects: ["server.ts", "client.ts", "tools/**/*.ts"]
+validates: ["server.ts", "client.ts", "tools/*.ts", "sandbox.ts"]
+alwaysApply: true
+autoFix: false
+---
+
+# Architecture Guidelines
+Provide a Bun/TypeScript server that wraps LM Studio’s OpenAI-compatible API and extends it with an MCP-like tool system.  
+Goal: enable local models in LM Studio to use external tools (fetch, files, zip, search, etc.) by producing structured JSON calls.  
+The server normalizes communication and exposes discovery endpoints.
+
+# Requirements
+- Must run in Bun with TypeScript.  
+- Must expose both SSE (`/chat`) and WebSocket (`/ws`) endpoints with identical JSON chunk protocol:  
+  - `{"type":"chunk","data":"..."}`  
+  - `{"type":"action","data":{...}}` for tool calls  
+  - `{"type":"done"}`  
+  - `{"type":"error","error":"..."}`  
+- Must inject a system prompt that describes available tools and requires JSON-only responses.  
+- Must enforce `response_format: { type: "json_object" }` in requests to LM Studio.  
+- Tools must be modular, discoverable from `/tools`, and callable via `/call`.  
+- Tools must live in `./tools` as independent `.ts` modules exporting:  
+  - `name: string`  
+  - `description: string`  
+  - `schema: JSON Schema`  
+  - `run(params): Promise<string>`  
+- Must include a sandbox directory for file tools to avoid unsafe filesystem access.  
+- Must normalize LM Studio output into structured events for both SSE and WebSockets.  
+
+# Architecture
+## Server
+- Bun + Hono web server.  
+- Endpoints:  
+  - `POST /chat`: chat completion with optional SSE streaming.  
+  - `GET /ws`: WebSocket chat interface.  
+  - `GET /tools`: list of available tools.  
+  - `POST /call`: execute tool by name and params.  
+- Responsibilities: inject system prompt, proxy LM Studio, handle streams.  
+
+## Tools
+- Drop-in modules in `./tools`.  
+- Must follow the Tool interface contract.  
+- Loaded dynamically at server startup.  
+
+## Client
+- Minimal TypeScript SDK (`client.ts`).  
+- Provides:  
+  - `chat(messages, onEvent, {transport:"sse"|"ws"})`  
+  - `listTools()`  
+  - `callTool(name, params)`  
+- Normalizes events from SSE and WS.  
+
+# Constraints
+- Do not modify LM Studio itself.  
+- Do not allow arbitrary shell/file access; all filesystem operations must remain sandboxed.  
+- Tool calls must always be JSON objects, never free text.  
+- Keep `server.ts` as the integration layer — LM Studio remains unmodified.  
+- Favor clarity and modularity over cleverness.  
+
+# Style
+- TypeScript with strict typing.  
+- Minimal dependencies (Hono, Bun built-ins).  
+- Consistent JSON event shapes across transports.  
+- No unnecessary comments, only concise explanations where needed.  
+
+# Future
+- Add automatic tool-call loop (execute tool, feed result back to model, repeat).  
+- Add auto-reconnect logic for WebSocket client SDK.  
+- Add persistent conversation state with history and context windows.  

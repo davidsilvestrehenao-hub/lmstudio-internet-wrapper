@@ -1,0 +1,121 @@
+---
+id: BUN-001
+name: Use Bun Runtime and Tools
+description: Standardize on Bun for runtime, package management, and development tools
+category: infrastructure
+severity: required
+globs: ["*.ts", "*.tsx", "*.html", "*.css", "*.js", "*.jsx", "package.json"]
+alwaysApply: true
+autoFix: true
+validates: ["package.json", "tsconfig.json", "*.ts", "*.js"]
+---
+
+# Bun Runtime Guidelines
+
+## Overview
+This rule enforces the use of Bun as the primary runtime and development tool instead of Node.js, npm, pnpm, Vite, or similar tools. Bun provides an all-in-one solution with better performance and simpler configuration.
+
+## Requirements
+
+### Command Line Usage
+| Instead of | Use |
+|------------|-----|
+| `node <file>` | `bun <file>` |
+| `npm/yarn/pnpm install` | `bun install` |
+| `npm/yarn/pnpm run` | `bun run` |
+| `jest/vitest` | `bun test` |
+| `webpack/esbuild` | `bun build` |
+
+### API Usage
+Replace these Node.js packages with Bun built-ins:
+
+```typescript
+// Instead of express
+Bun.serve({
+  port: 3000,
+  fetch(req) {
+    return new Response("Hello World");
+  }
+});
+
+// Instead of node:fs
+const file = Bun.file("path/to/file");
+await file.text();
+
+// Instead of ws
+Bun.serve({
+  websocket: {
+    message(ws, message) { }
+  }
+});
+
+// Instead of better-sqlite3
+import { Database } from "bun:sqlite";
+
+// Instead of pg
+import { Client } from "bun:pg";
+```
+
+### Environment Variables
+- Bun automatically loads .env files
+- Do not use dotenv or similar packages
+
+### Testing
+Use Bun's built-in test runner:
+```typescript
+import { test, expect } from "bun:test";
+
+test("example", () => {
+  expect(1 + 1).toBe(2);
+});
+```
+
+### Frontend Development
+- Use Bun's built-in bundler instead of Vite
+- HTML imports are supported natively
+- React and CSS modules work out of the box
+
+## Examples
+
+### Server Setup
+```typescript
+import { serve } from "bun";
+
+export default {
+  port: 3000,
+  fetch(req) {
+    return new Response("Hello");
+  }
+};
+```
+
+### Frontend Setup
+```html
+<html>
+  <script type="module" src="./app.tsx"></script>
+</html>
+```
+
+### Package Scripts
+```json
+{
+  "scripts": {
+    "start": "bun run server.ts",
+    "dev": "bun --hot run server.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist",
+    "test": "bun test"
+  }
+}
+```
+
+## Validation
+The rule is violated if:
+- Node.js-specific APIs are used instead of Bun equivalents
+- npm/yarn/pnpm commands are used in scripts
+- External bundlers or test runners are configured
+- Explicit .env loading packages are used
+
+## References
+- [Bun Documentation](https://bun.sh/docs)
+- [Bun API Reference](https://bun.sh/docs/api)
+- Package types: `node_modules/bun-types/**.d.ts`
