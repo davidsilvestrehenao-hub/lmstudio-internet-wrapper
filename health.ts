@@ -14,6 +14,7 @@ let circuitBreakerState: {
   lastFailureTime: 0,
 };
 
+
 export function setCircuitBreakerState(state: {
   state: string;
   failures: number;
