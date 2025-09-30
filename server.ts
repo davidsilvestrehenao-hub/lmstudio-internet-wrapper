@@ -163,11 +163,16 @@ function toolPrompt(): string {
   );
   return `You are a tool-using model with access to tools via MCP (Model Context Protocol).
 
-Always respond ONLY with a valid JSON object following this schema:
+You can generate MULTIPLE tool calls in a single response. Each tool call should be a separate JSON object on its own line.
 
+Example format for multiple tool calls:
 {
-  "action": "<tool name>",
-  "params": { ... }
+  "action": "search",
+  "params": { "query": "cows", "engine": "duckduckgo" }
+}
+{
+  "action": "writeFile", 
+  "params": { "path": "cows.txt", "content": "Search results..." }
 }
 
 Available tools:
@@ -181,29 +186,45 @@ No narration, no natural language — just structured JSON tool calls.`;
 function parseMultipleJSONObjects(text: string): Array<{ action: string; params: Record<string, unknown> }> {
   const results: Array<{ action: string; params: Record<string, unknown> }> = [];
   
-  // Split by lines and try to parse each line as JSON
-  const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  // First, try to parse the entire text as a single JSON object
+  try {
+    const json = JSON.parse(text);
+    if (json.action && json.params) {
+      results.push(json);
+      return results;
+    }
+  } catch {
+    // If that fails, try to find multiple JSON objects
+  }
   
-  for (const line of lines) {
-    try {
-      const json = JSON.parse(line);
-      if (json.action && json.params) {
-        results.push(json);
+  // Look for complete JSON objects in the text using a more robust approach
+  const remaining = text;
+  let braceCount = 0;
+  let startIndex = -1;
+  
+  for (let i = 0; i < remaining.length; i++) {
+    const char = remaining[i];
+    
+    if (char === '{') {
+      if (braceCount === 0) {
+        startIndex = i;
       }
-    } catch {
-      // If line parsing fails, try to find JSON objects within the line
-      const jsonMatches = line.match(/\{[^{}]*"action"[^{}]*\}/g);
-      if (jsonMatches) {
-        for (const match of jsonMatches) {
-          try {
-            const json = JSON.parse(match);
-            if (json.action && json.params) {
-              results.push(json);
-            }
-          } catch {
-            // Skip invalid JSON
+      braceCount++;
+    } else if (char === '}') {
+      braceCount--;
+      
+      if (braceCount === 0 && startIndex !== -1) {
+        // We have a complete JSON object
+        const jsonStr = remaining.substring(startIndex, i + 1);
+        try {
+          const json = JSON.parse(jsonStr);
+          if (json.action && json.params) {
+            results.push(json);
           }
+        } catch {
+          // Skip invalid JSON
         }
+        startIndex = -1;
       }
     }
   }
@@ -341,10 +362,8 @@ async function* streamLMStudio(
                     }
                     // Clear the buffer after successful parsing
                     contentBuffer = "";
-                  } else {
-                    // If no complete JSON objects yet, yield as chunk
-                    yield { type: "chunk", data: text } as const;
                   }
+                  // Don't yield chunks immediately - wait for complete JSON or end of stream
                 }
               } catch (parseError) {
                 logger.debug("Ignoring malformed LM Studio chunk", {

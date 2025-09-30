@@ -524,7 +524,7 @@ Search the web.
 **Parameters:**
 
 - `query` (string, required): Search query
-- `engine` (string, optional): Search engine (duckduckgo, google, bing, brave)
+- `engine` (string, optional): Search engine (duckduckgo only) - defaults to duckduckgo
 
 **Example:**
 

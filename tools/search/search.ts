@@ -8,14 +8,14 @@ export const schema = {
     query: { type: "string" },
     engine: {
       type: "string",
-      enum: ["duckduckgo", "google", "bing", "brave"],
+      enum: ["duckduckgo"],
       default: "duckduckgo",
     },
   },
   required: ["query"],
 };
 
-type SearchEngine = "duckduckgo" | "google" | "bing" | "brave";
+type SearchEngine = "duckduckgo";
 
 interface SearchResult {
   title: string;
@@ -81,112 +81,29 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
     );
   }
 
+  // If no results found, provide helpful feedback
+  if (results.length === 0) {
+    results.push({
+      title: "No results found",
+      url: "",
+      snippet: `DuckDuckGo didn't return results for "${query}". This is common for:
+- Recent news queries (DuckDuckGo API doesn't provide real-time news)
+- Very specific or niche topics
+- Queries that need real-time data
+
+Try:
+- More general search terms
+- Broader topic keywords
+- Using the fetch tool to get data from specific news websites`,
+      source: "DuckDuckGo",
+    });
+  }
+
   return results.slice(0, 10); // Limit to 10 results
 }
 
-async function searchGoogle(query: string): Promise<SearchResult[]> {
-  // Note: This is a simplified example. Real Google Search API requires API key
-  const res = await fetch(
-    `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(query)}`,
-  );
 
-  if (!res.ok) {
-    throw new Error(
-      "Google Search API requires GOOGLE_API_KEY and GOOGLE_CX environment variables",
-    );
-  }
 
-  const data = (await res.json()) as {
-    items?: Array<{
-      title?: string;
-      link?: string;
-      snippet?: string;
-    }>;
-  };
-
-  return (
-    data.items?.map((item) => ({
-      title: item.title || "No title",
-      url: item.link || "",
-      snippet: item.snippet || "",
-      source: "Google",
-    })) || []
-  );
-}
-
-async function searchBing(query: string): Promise<SearchResult[]> {
-  const apiKey = process.env.BING_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "Bing Search API requires BING_API_KEY environment variable",
-    );
-  }
-
-  const res = await fetch(
-    `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}`,
-    {
-      headers: {
-        "Ocp-Apim-Subscription-Key": apiKey,
-      },
-    },
-  );
-
-  const data = (await res.json()) as {
-    webPages?: {
-      value?: Array<{
-        name?: string;
-        url?: string;
-        snippet?: string;
-      }>;
-    };
-  };
-
-  return (
-    data.webPages?.value?.map((item) => ({
-      title: item.name || "No title",
-      url: item.url || "",
-      snippet: item.snippet || "",
-      source: "Bing",
-    })) || []
-  );
-}
-
-async function searchBrave(query: string): Promise<SearchResult[]> {
-  const apiKey = process.env.BRAVE_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "Brave Search API requires BRAVE_API_KEY environment variable",
-    );
-  }
-
-  const res = await fetch(
-    `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}`,
-    {
-      headers: {
-        "X-Subscription-Token": apiKey,
-      },
-    },
-  );
-
-  const data = (await res.json()) as {
-    web?: {
-      results?: Array<{
-        title?: string;
-        url?: string;
-        description?: string;
-      }>;
-    };
-  };
-
-  return (
-    data.web?.results?.map((item) => ({
-      title: item.title || "No title",
-      url: item.url || "",
-      snippet: item.description || "",
-      source: "Brave",
-    })) || []
-  );
-}
 
 export async function run(params: {
   query: string;
@@ -199,15 +116,6 @@ export async function run(params: {
     switch (engine) {
       case "duckduckgo":
         results = await searchDuckDuckGo(params.query);
-        break;
-      case "google":
-        results = await searchGoogle(params.query);
-        break;
-      case "bing":
-        results = await searchBing(params.query);
-        break;
-      case "brave":
-        results = await searchBrave(params.query);
         break;
       default:
         throw new Error(`Unsupported search engine: ${engine}`);
